@@ -5,6 +5,7 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import jdk.nashorn.internal.AssertsEnabled;
 import org.apache.commons.lang3.time.DateUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -30,6 +31,8 @@ public class adactinSteps {
     private List<String> results = new ArrayList<String>();
     private int adults;
     private int no_rooms;
+    private String orderid;
+
 
     public adactinSteps(SharedDriver webDriver) {
         this.webDriver = webDriver; 
@@ -257,5 +260,91 @@ public class adactinSteps {
                 assertEquals(element.getAttribute("value").toLowerCase(), object.toString().toLowerCase());
             }
         }
+    }
+
+    @Then("^The billed price should be correct$")
+    public void theBilledPriceShouldBeCorrect() throws Throwable {
+        double price = 125 ;
+        double total = price * adults * no_rooms * 110/100;
+        WebElement element = webDriver.findElement(By.id("final_price_dis"));
+        assertEquals("AUD $ " + total + "", element.getAttribute("value"));
+    }
+
+    @And("^I click on the search button$")
+    public void iClickOnTheSearchButton() throws Throwable {
+        webDriver.findElement(By.id("Submit")).click();
+    }
+
+    @And("^I select the hotel and click on the continue button$")
+    public void iSelectTheHotelAndClickOnTheContinueButton() throws Throwable {
+        webDriver.findElement(By.cssSelector("input[id='radiobutton_0']")).click();
+        webDriver.findElement(By.id("continue")).click();
+    }
+
+    @Then("^The displayed data should be correct$")
+    public void theDisplayedDataShouldBeCorrect() throws Throwable {
+        WebElement hotelname = webDriver.findElement(By.id("hotel_name_dis"));
+        assertEquals(hotelname.getAttribute("value"), "Hotel Creek");
+        WebElement location = webDriver.findElement(By.id("location_dis"));
+        assertEquals(location.getAttribute("value"), "Sydney");
+        WebElement roomtype = webDriver.findElement(By.id("room_type_dis"));
+        assertEquals(roomtype.getAttribute("value"), "Standard");
+        WebElement numberofrooms = webDriver.findElement(By.id("room_num_dis"));
+        assertEquals(numberofrooms.getAttribute("value"), "2 Room(s)");
+        WebElement totaldays = webDriver.findElement(By.id("total_days_dis"));
+        assertEquals(totaldays.getAttribute("value"), "1 Day(s)");
+        WebElement pricepernight = webDriver.findElement(By.id("price_night_dis"));
+        assertEquals(pricepernight.getAttribute("value"), "AUD $ 125");
+    }
+
+    @Then("^The Order number is generated$")
+    public void theOrderNumberIsGenerated() throws Throwable {
+        WebDriverWait wait = new WebDriverWait(webDriver, 10);
+        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("order_no")));
+        WebElement element1 = webDriver.findElement(By.id("order_no"));
+        assertEquals(10, element1.getAttribute("value").length());
+        orderid = element1.getAttribute("value");
+    }
+
+    @And("^the customerdata is entered$")
+    public void theCustomerdataIsEntered() throws Throwable {
+        WebElement firstname = webDriver.findElement(By.id("first_name"));
+        firstname.sendKeys("Rolf");
+        WebElement lastname = webDriver.findElement(By.id("last_name"));
+        lastname.sendKeys("van der Veer");
+        WebElement address = webDriver.findElement(By.id("address"));
+        address.sendKeys("Aweg 50 Groningen");
+        WebElement creditcardnum = webDriver.findElement(By.id("cc_num"));
+        creditcardnum.sendKeys("1234567890987654");
+        WebElement creditcardtype = webDriver.findElement(By.id("cc_type"));
+        creditcardtype.sendKeys("AMEX");
+        WebElement expmonth = webDriver.findElement(By.id("cc_exp_month"));
+        expmonth.sendKeys("February");
+        WebElement expyear = webDriver.findElement(By.id("cc_exp_year"));
+        expyear.sendKeys("2018");
+        WebElement cvvnumber = webDriver.findElement(By.id("cc_cvv"));
+        cvvnumber.sendKeys("1234");
+    }
+
+    @And("^I click on the Book now button$")
+    public void iClickOnTheBookNowButton() throws Throwable {
+        webDriver.findElement(By.id("book_now")).click();
+    }
+
+    @And("^I click on the My itinerary button$")
+    public void iClickOnTheMyItineraryButton() throws Throwable {
+        WebDriverWait wait = new WebDriverWait(webDriver, 10);
+        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("order_no")));
+        webDriver.findElement(By.id("my_itinerary")).click();
+    }
+
+    @Then("^The itinerary details are not editable$")
+    public void theItineraryDetailsAreNotEditable() throws Throwable {
+        String digits;
+        WebElement element1 = webDriver.findElement(By.xpath("//div[contains(@value, orderid)]"));
+        digits = element1.getAttribute("id").substring(9);
+        String hotelid = "hotel_name_" + digits;
+        WebElement hotelname = webDriver.findElement(By.id(hotelid));
+        assertEquals (hotelname.getAttribute("onfocus"), "disable_ctrlV()");
     }
 }
