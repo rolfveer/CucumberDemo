@@ -1,6 +1,7 @@
 package com.atos.cucumberdemo.step;
 
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -341,10 +342,75 @@ public class adactinSteps {
     @Then("^The itinerary details are not editable$")
     public void theItineraryDetailsAreNotEditable() throws Throwable {
         String digits;
-        WebElement element1 = webDriver.findElement(By.xpath("//div[contains(@value, orderid)]"));
+        WebElement element1 = webDriver.findElement(By.xpath("//input[@value='"+orderid+"']"));
         digits = element1.getAttribute("id").substring(9);
         String hotelid = "hotel_name_" + digits;
+        String locationid = "location_" + digits;
+        String roomsid = "rooms_" + digits;
+        String totalpriceid = "total_price_" + digits;
         WebElement hotelname = webDriver.findElement(By.id(hotelid));
         assertEquals (hotelname.getAttribute("onfocus"), "disable_ctrlV()");
+        WebElement loc = webDriver.findElement(By.id(locationid));
+        assertEquals (loc.getAttribute("onfocus"), "disable_ctrlV()");
+        WebElement rms = webDriver.findElement(By.id(roomsid));
+        assertEquals (rms.getAttribute("onfocus"), "disable_ctrlV()");
+        WebElement totpr = webDriver.findElement(By.id(totalpriceid));
+        assertEquals (totpr.getAttribute("onfocus"), "disable_ctrlV()");
+    }
+
+    @Then("^The itinerary details are correct$")
+    public void theItineraryDetailsAreCorrect() throws Throwable {
+        String digits;
+        WebElement element1 = webDriver.findElement(By.xpath("//input[@value='"+orderid+"']"));
+        digits = element1.getAttribute("id").substring(9);
+        String hotelid = "hotel_name_" + digits;
+        String locationid = "location_" + digits;
+        String roomsid = "rooms_" + digits;
+        String totalpriceid = "total_price_" + digits;
+        String lastnameid = "last_name_" + digits;
+        WebElement hotelname = webDriver.findElement(By.id(hotelid));
+        assertEquals (hotelname.getAttribute("value"), "Hotel Creek");
+        WebElement loc = webDriver.findElement(By.id(locationid));
+        assertEquals (loc.getAttribute("value"), "Sydney");
+        WebElement rms = webDriver.findElement(By.id(roomsid));
+        assertEquals (rms.getAttribute("value"), "2 Room(s)");
+        WebElement totpr = webDriver.findElement(By.id(totalpriceid));
+        assertEquals (totpr.getAttribute("value"), "AUD $ 275");
+        WebElement lastnm = webDriver.findElement(By.id(lastnameid));
+        assertEquals (lastnm.getAttribute("value"), "van der Veer");
+
+    }
+
+    @Then("^the orderdetails of the selected order are shown correctly$")
+    public void theOrderdetailsOfTheSelectedOrderAreShownCorrectly() throws Throwable {
+        WebElement ord = webDriver.findElement(By.id("order_id_139730"));
+        assertEquals (ord.getAttribute("value"), "8HZ7OI7314");
+        WebElement hotelname = webDriver.findElement(By.id("hotel_name_139730"));
+        assertEquals (hotelname.getAttribute("value"), "Hotel Creek");
+        WebElement loc = webDriver.findElement(By.id("location_139730"));
+        assertEquals (loc.getAttribute("value"), "Sydney");
+        WebElement rms = webDriver.findElement(By.id("rooms_139730"));
+        assertEquals (rms.getAttribute("value"), "2 Room(s)");
+        WebElement totpr = webDriver.findElement(By.id("total_price_139730"));
+        assertEquals (totpr.getAttribute("value"), "AUD $ 149");
+        WebElement lastnm = webDriver.findElement(By.id("last_name_139730"));
+        assertEquals (lastnm.getAttribute("value"), "van der Veer");
+    }
+
+    @When("^I click on the booked itinerary link$")
+    public void iClickOnTheBookItineraryLink() throws Throwable {
+        webDriver.findElement(By.xpath("//a[@href='BookedItinerary.php']")).click();
+    }
+
+    @And("^provide the order id$")
+    public void provideTheOrderId() throws Throwable {
+        WebElement ord = webDriver.findElement(By.id("order_id_text"));
+        ord.sendKeys("8HZ7OI7314");
+    }
+
+    @And("^click on the Go button$")
+    public void clickOnTheGoButton() throws Throwable {
+        webDriver.findElement(By.id("search_hotel_id")).click();
+
     }
 }
