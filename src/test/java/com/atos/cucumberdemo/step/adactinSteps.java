@@ -8,7 +8,9 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import jdk.nashorn.internal.AssertsEnabled;
 import org.apache.commons.lang3.time.DateUtils;
+import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -411,6 +413,58 @@ public class adactinSteps {
     @And("^click on the Go button$")
     public void clickOnTheGoButton() throws Throwable {
         webDriver.findElement(By.id("search_hotel_id")).click();
+    }
+
+    @And("^I check the checkbox of the order inserted$")
+    public void iCheckTheCheckboxOfTheOrderInserted() throws Throwable {
+        String digits;
+        WebElement element1 = webDriver.findElement(By.xpath("//input[@value='"+orderid+"']"));
+        digits = element1.getAttribute("id").substring(9);
+        WebElement element2 = webDriver.findElement(By.xpath("//input[@value='"+digits+"']"));
+        element2.click();
+    }
+
+    @And("^I click on the Cancel Selected button$")
+    public void iClickOnTheCancelSelectedButton() throws Throwable {
+        WebElement element = webDriver.findElement(By.name("cancelall"));
+        element.click();
+        webDriver.switchTo().alert().accept();
+    }
+
+    @Then("^The orderdata has been removed from the booked itinerary page$")
+    public void theOrderdataHasBeenRemovedFromTheBookedItineraryPage() throws Throwable {
+
+                //WebElement element = webDriver.findElement(By.xpath("//input[@value='600J05K95G']"));
+        try {
+            WebElement element = webDriver.findElement(By.xpath("//input[@value='" + orderid + "']"));
+            assertEquals(element,null);
+        }
+        catch (NoSuchElementException e)
+        {
+
+        }
+
+    }
+
+    @Then("^the title of the page is \"([^\"]*)\"$")
+    public void theTitleOfThePageIs(String title) throws Throwable {
+        this.results.add(title);
+        WebElement element = webDriver.findElement(By.xpath("//td[@class = 'login_title']"));
+        String retrievedtitle = element.getText();
+
+        if (retrievedtitle.length() >25) {
+            assertEquals(retrievedtitle.substring(0, 12), title);
+        }
+        else {
+            if (retrievedtitle.equals("Back")) {
+                WebElement element2 = webDriver.findElement(By.xpath("//tbody/tr[2]/td[@class = 'login_title']"));
+                retrievedtitle = element2.getText();
+                assertEquals(retrievedtitle, title);
+            }
+            else {
+                assertEquals(retrievedtitle, title);
+            }
+        }
 
     }
 }
